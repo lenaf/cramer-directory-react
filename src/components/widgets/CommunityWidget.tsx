@@ -5,16 +5,10 @@ import {
   IonCardTitle, 
   IonCardContent
 } from '@ionic/react';
-import useFirestore from '../../hooks/useFirestore';
-import { Community } from '../../types/Community';
+import { useCommunity } from '../../hooks/useContent';
 
 const CommunityWidget: React.FC = () => {
-  const { useCollection } = useFirestore();
-  const { data: communities, loading, error } = useCollection<Community>(
-    'community',
-    [{ property: 'isActive', operator: '==', value: true }],
-    [{ property: 'weight', direction: 'asc' }]
-  );
+  const { data: communities, loading, error } = useCommunity();
 
   console.log('CommunityWidget - loading:', loading, 'communities:', communities, 'error:', error);
 

@@ -22,7 +22,7 @@ const HomePage: React.FC = () => {
       <IonHeader>
         <IonToolbar color="secondary">
           <IonButtons slot="start">
-            <IonMenuButton />
+            <IonMenuButton menu="main-menu" />
           </IonButtons>
           <IonTitle>
             <strong className="ion-text-uppercase">
@@ -43,7 +43,7 @@ const HomePage: React.FC = () => {
       <IonContent>
         <PillarWidget />
         <EventWidget />
-        <AdWidget className="ion-padding-horizontal" />
+        <AdWidget className="ion-padding-horizontal" type="banner" />
         <ResourceWidget />
         <CommunityWidget />
       </IonContent>

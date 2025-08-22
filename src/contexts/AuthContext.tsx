@@ -1,16 +1,16 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
-import { useFirebase } from './FirebaseContext';
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import { auth, db } from '../lib/firebase';
+import { AuthService } from '../services/AuthService';
+import { FirestoreService } from '../services/FirestoreService';
+import { Auth } from '../types/Auth';
 
 interface AuthContextType {
-  user: User | null;
+  auth: Auth | null;
+  authService: AuthService;
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true
-});
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -21,21 +21,32 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { auth } = useFirebase();
-  const [user, setUser] = useState<User | null>(null);
+  const [authData, setAuthData] = useState<Auth | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const authService = useMemo(() => {
+    const firestoreService = new FirestoreService(db);
+    return new AuthService(auth, firestoreService);
+  }, []);
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
+    const subscription = authService.auth$.subscribe({
+      next: (authData) => {
+        setAuthData(authData);
+        setLoading(false);
+      },
+      error: (error) => {
+        console.error('Auth error:', error);
+        setAuthData(null);
+        setLoading(false);
+      }
     });
 
-    return () => unsubscribe();
-  }, [auth]);
+    return () => subscription.unsubscribe();
+  }, [authService]);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ auth: authData, authService, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -7,16 +7,10 @@ import {
   IonCardContent,
   IonButton
 } from '@ionic/react';
-import useFirestore from '../../hooks/useFirestore';
-import { Event } from '../../types/Event';
+import { useEvents } from '../../hooks/useEvents';
 
 const EventWidget: React.FC = () => {
-  const { useCollection } = useFirestore();
-  const { data: events, loading, error } = useCollection<Event>(
-    'event',
-    [{ property: 'isActive', operator: '==', value: true }],
-    [{ property: 'weight', direction: 'asc' }, { property: 'startDate', direction: 'asc' }]
-  );
+  const { data: events, loading, error } = useEvents();
 
   console.log('EventWidget - loading:', loading, 'events:', events, 'error:', error);
 

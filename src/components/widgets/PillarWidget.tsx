@@ -6,16 +6,10 @@ import {
   IonCardSubtitle, 
   IonCardContent
 } from '@ionic/react';
-import useFirestore from '../../hooks/useFirestore';
-import { Pillar } from '../../types/Pillar';
+import { usePillars } from '../../hooks/useContent';
 
 const PillarWidget: React.FC = () => {
-  const { useCollection } = useFirestore();
-  const { data: pillars, loading, error } = useCollection<Pillar>(
-    'pillar',
-    [{ property: 'isActive', operator: '==', value: true }],
-    [{ property: 'weight', direction: 'asc' }]
-  );
+  const { data: pillars, loading, error } = usePillars();
 
   console.log('PillarWidget - loading:', loading, 'pillars:', pillars, 'error:', error);
 

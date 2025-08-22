@@ -5,16 +5,10 @@ import {
   IonCardTitle, 
   IonCardContent
 } from '@ionic/react';
-import useFirestore from '../../hooks/useFirestore';
-import { Resource } from '../../types/Resource';
+import { useResources } from '../../hooks/useContent';
 
 const ResourceWidget: React.FC = () => {
-  const { useCollection } = useFirestore();
-  const { data: resources, loading, error } = useCollection<Resource>(
-    'resource',
-    [{ property: 'isActive', operator: '==', value: true }],
-    [{ property: 'weight', direction: 'asc' }]
-  );
+  const { data: resources, loading, error } = useResources();
 
   console.log('ResourceWidget - loading:', loading, 'resources:', resources, 'error:', error);
 

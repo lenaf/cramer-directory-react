@@ -12,37 +12,37 @@ import ProfilePage from './pages/ProfilePage';
 const TabsLayout: React.FC = () => {
   return (
     <IonTabs>
-      <IonRouterOutlet>
-        <Route exact path="/tabs/home" component={HomePage} />
-        <Route exact path="/tabs/company" component={CompanyPage} />
-        <Route exact path="/tabs/people" component={PeoplePage} />
-        <Route exact path="/tabs/category" component={CategoryPage} />
-        <Route exact path="/tabs/profile" component={ProfilePage} />
-        <Route exact path="/tabs" render={() => <Redirect to="/tabs/home" />} />
+      <IonRouterOutlet id="main-content">
+        <Route exact path="/home" component={HomePage} />
+        <Route exact path="/people" component={PeoplePage} />
+        <Route exact path="/company" component={CompanyPage} />
+        <Route exact path="/category" component={CategoryPage} />
+        <Route exact path="/profile" component={ProfilePage} />
+        <Route exact path="/" render={() => <Redirect to="/home" />} />
       </IonRouterOutlet>
       
-      <IonTabBar slot="bottom">
-        <IonTabButton tab="home" href="/tabs/home">
+      <IonTabBar slot="bottom" color="secondary">
+        <IonTabButton tab="home" href="/home">
           <IonIcon icon={home} />
           <IonLabel>Home</IonLabel>
         </IonTabButton>
         
-        <IonTabButton tab="company" href="/tabs/company">
-          <IonIcon icon={business} />
-          <IonLabel>Companies</IonLabel>
-        </IonTabButton>
-        
-        <IonTabButton tab="people" href="/tabs/people">
+        <IonTabButton tab="people" href="/people">
           <IonIcon icon={people} />
           <IonLabel>People</IonLabel>
         </IonTabButton>
         
-        <IonTabButton tab="category" href="/tabs/category">
+        <IonTabButton tab="company" href="/company">
+          <IonIcon icon={business} />
+          <IonLabel>Companies</IonLabel>
+        </IonTabButton>
+        
+        <IonTabButton tab="category" href="/category">
           <IonIcon icon={grid} />
           <IonLabel>Categories</IonLabel>
         </IonTabButton>
         
-        <IonTabButton tab="profile" href="/tabs/profile">
+        <IonTabButton tab="profile" href="/profile">
           <IonIcon icon={person} />
           <IonLabel>Profile</IonLabel>
         </IonTabButton>
