@@ -6,7 +6,6 @@ import {
   IonTitle,
   IonToolbar,
   IonButtons,
-  IonMenuButton,
   IonList,
   IonItem,
   IonAvatar,
@@ -14,12 +13,12 @@ import {
   IonLabel,
   IonIcon,
   IonButton,
-  IonSpinner,
   IonCard,
   IonCardHeader,
   IonCardTitle,
   IonCardSubtitle,
   IonCardContent,
+  IonMenuToggle,
 } from "@ionic/react";
 import {
   personOutline,
@@ -28,6 +27,7 @@ import {
   logOutOutline,
   peopleOutline,
   starOutline,
+  menu,
 } from "ionicons/icons";
 import { useAuth } from "../../contexts/AuthContext";
 import LoginForm from "../auth/LoginForm";
@@ -46,40 +46,16 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <IonPage>
-        <IonHeader>
-          <IonToolbar color="secondary">
-            <IonButtons slot="start">
-              <IonMenuButton menu="main-menu" />
-            </IonButtons>
-            <IonTitle>
-              <strong className="ion-text-uppercase">Profile</strong>
-            </IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <IonSpinner />
-          </div>
-        </IonContent>
-      </IonPage>
-    );
-  }
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar color="secondary">
           <IonButtons slot="start">
-            <IonMenuButton menu="main-menu" />
+            <IonMenuToggle>
+              <IonButton>
+                <IonIcon slot="icon-only" icon={menu}></IonIcon>
+              </IonButton>
+            </IonMenuToggle>
           </IonButtons>
           <IonTitle>
             <strong className="ion-text-uppercase">Profile</strong>
@@ -88,7 +64,16 @@ const ProfilePage: React.FC = () => {
       </IonHeader>
 
       <IonContent>
-        {auth ? (
+        {loading ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          ></div>
+        ) : auth ? (
           // Authenticated user view
           <>
             <div style={{ padding: "20px", textAlign: "center" }}>
@@ -178,7 +163,7 @@ const ProfilePage: React.FC = () => {
             </IonCardContent>
           </IonCard>
         )}
-        
+
         <LoginForm
           isOpen={showLoginModal}
           onClose={() => setShowLoginModal(false)}

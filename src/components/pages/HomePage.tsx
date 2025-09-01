@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   IonContent,
   IonHeader,
@@ -6,23 +6,31 @@ import {
   IonTitle,
   IonToolbar,
   IonButtons,
-  IonMenuButton,
-  IonSearchbar
-} from '@ionic/react';
+  IonSearchbar,
+  IonButton,
+  IonMenuToggle,
+  IonIcon,
+} from "@ionic/react";
 
-import PillarWidget from '../widgets/PillarWidget';
-import EventWidget from '../widgets/EventWidget';
-import AdWidget from '../widgets/AdWidget';
-import ResourceWidget from '../widgets/ResourceWidget';
-import CommunityWidget from '../widgets/CommunityWidget';
+import PillarWidget from "../widgets/PillarWidget";
+import EventWidget from "../widgets/EventWidget";
+import AdWidget from "../widgets/AdWidget";
+import ResourceWidget from "../widgets/ResourceWidget";
+import CommunityWidget from "../widgets/CommunityWidget";
+import { menu } from "ionicons/icons";
 
 const HomePage: React.FC = () => {
   return (
     <IonPage>
+      {/* HEADER */}
       <IonHeader>
         <IonToolbar color="secondary">
           <IonButtons slot="start">
-            <IonMenuButton menu="main-menu" />
+            <IonMenuToggle>
+              <IonButton>
+                <IonIcon slot="icon-only" icon={menu}></IonIcon>
+              </IonButton>
+            </IonMenuToggle>
           </IonButtons>
           <IonTitle>
             <strong className="ion-text-uppercase">
@@ -30,16 +38,16 @@ const HomePage: React.FC = () => {
             </strong>
           </IonTitle>
         </IonToolbar>
-        
+
         <IonToolbar color="secondary">
-          <IonSearchbar 
-            debounce={500} 
-            placeholder="Search..." 
+          <IonSearchbar
+            debounce={500}
+            placeholder="Search..."
             animated={true}
           />
         </IonToolbar>
       </IonHeader>
-      
+
       <IonContent>
         <PillarWidget />
         <EventWidget />

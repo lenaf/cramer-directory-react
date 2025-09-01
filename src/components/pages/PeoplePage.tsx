@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   IonContent,
   IonHeader,
@@ -6,7 +6,6 @@ import {
   IonTitle,
   IonToolbar,
   IonButtons,
-  IonMenuButton,
   IonSearchbar,
   IonList,
   IonItemGroup,
@@ -18,10 +17,14 @@ import {
   IonFooter,
   IonSegment,
   IonSegmentButton,
-  IonSkeletonText
-} from '@ionic/react';
-import { usePeople } from '../../hooks/usePeople';
-import { Person } from '../../types/Person';
+  IonSkeletonText,
+  IonMenuToggle,
+  IonButton,
+  IonIcon,
+} from "@ionic/react";
+import { usePeople } from "../../hooks/usePeople";
+import { Person } from "../../types/Person";
+import { menu } from "ionicons/icons";
 
 const PeoplePage: React.FC = () => {
   const { data: people, loading, error } = usePeople();
@@ -29,10 +32,10 @@ const PeoplePage: React.FC = () => {
   // Group people by first letter of last name
   const groupPeopleByLetter = (people: Person[]) => {
     const groups: { [key: string]: Person[] } = {};
-    
-    people.forEach(person => {
-      const firstLetter = (person.lastName || '').charAt(0).toUpperCase();
-      const letter = firstLetter || '#';
+
+    people.forEach((person) => {
+      const firstLetter = (person.lastName || "").charAt(0).toUpperCase();
+      const letter = firstLetter || "#";
       if (!groups[letter]) {
         groups[letter] = [];
       }
@@ -48,22 +51,26 @@ const PeoplePage: React.FC = () => {
       <IonHeader>
         <IonToolbar color="secondary">
           <IonButtons slot="start">
-            <IonMenuButton menu="main-menu" />
+            <IonMenuToggle>
+              <IonButton>
+                <IonIcon slot="icon-only" icon={menu}></IonIcon>
+              </IonButton>
+            </IonMenuToggle>
           </IonButtons>
           <IonTitle>
             <strong className="ion-text-uppercase">People</strong>
           </IonTitle>
         </IonToolbar>
-        
+
         <IonToolbar color="secondary">
-          <IonSearchbar 
-            debounce={500} 
-            placeholder="Search people..." 
+          <IonSearchbar
+            debounce={500}
+            placeholder="Search people..."
             animated={true}
           />
         </IonToolbar>
       </IonHeader>
-      
+
       <IonContent>
         {loading ? (
           <IonList>
@@ -74,57 +81,72 @@ const PeoplePage: React.FC = () => {
                 </IonAvatar>
                 <IonLabel>
                   <h3>
-                    <IonSkeletonText animated style={{ width: '50%' }} />
+                    <IonSkeletonText animated style={{ width: "50%" }} />
                   </h3>
                   <p>
-                    <IonSkeletonText animated style={{ width: '80%' }} />
+                    <IonSkeletonText animated style={{ width: "80%" }} />
                   </p>
                   <p>
-                    <IonSkeletonText animated style={{ width: '60%' }} />
+                    <IonSkeletonText animated style={{ width: "60%" }} />
                   </p>
                 </IonLabel>
               </IonItem>
             ))}
           </IonList>
         ) : error ? (
-          <div style={{ textAlign: 'center', padding: '20px' }}>
+          <div style={{ textAlign: "center", padding: "20px" }}>
             <p>Error loading people. Please try again.</p>
           </div>
         ) : (
           <IonList>
-            {Object.keys(groupedPeople).sort().map((letter) => (
-              <IonItemGroup key={letter}>
-                <IonItemDivider color="light" sticky>
-                  <IonLabel>{letter}</IonLabel>
-                </IonItemDivider>
-                
-                {groupedPeople[letter].map((person) => (
-                  <IonItem key={person.id} button>
-                    <IonAvatar slot="start">
-                      <IonImg 
-                        src={person.imageURL || person.photoURL || './assets/placeholders/person-circle-outline.svg'} 
-                        alt="avatar"
-                        onIonError={(e) => {
-                          (e.target as HTMLIonImgElement).src = './assets/placeholders/person-circle-outline.svg';
-                        }}
-                      />
-                    </IonAvatar>
-                    <IonLabel>
-                      <h2>
-                        {person.firstName && <span>{person.firstName} </span>}
-                        {person.lastName && <strong>{person.lastName}</strong>}
-                      </h2>
-                      {person.company && <p>{typeof person.company === 'string' ? person.company : person.company.name}</p>}
-                      {person.jobTitle && <p>{person.jobTitle}</p>}
-                    </IonLabel>
-                  </IonItem>
-                ))}
-              </IonItemGroup>
-            ))}
+            {Object.keys(groupedPeople)
+              .sort()
+              .map((letter) => (
+                <IonItemGroup key={letter}>
+                  <IonItemDivider color="light" sticky>
+                    <IonLabel>{letter}</IonLabel>
+                  </IonItemDivider>
+
+                  {groupedPeople[letter].map((person) => (
+                    <IonItem key={person.id} button>
+                      <IonAvatar slot="start">
+                        <IonImg
+                          src={
+                            person.imageURL ||
+                            person.photoURL ||
+                            "./assets/placeholders/person-circle-outline.svg"
+                          }
+                          alt="avatar"
+                          onIonError={(e) => {
+                            (e.target as HTMLIonImgElement).src =
+                              "./assets/placeholders/person-circle-outline.svg";
+                          }}
+                        />
+                      </IonAvatar>
+                      <IonLabel>
+                        <h2>
+                          {person.firstName && <span>{person.firstName} </span>}
+                          {person.lastName && (
+                            <strong>{person.lastName}</strong>
+                          )}
+                        </h2>
+                        {person.company && (
+                          <p>
+                            {typeof person.company === "string"
+                              ? person.company
+                              : person.company.name}
+                          </p>
+                        )}
+                        {person.jobTitle && <p>{person.jobTitle}</p>}
+                      </IonLabel>
+                    </IonItem>
+                  ))}
+                </IonItemGroup>
+              ))}
           </IonList>
         )}
       </IonContent>
-      
+
       <IonFooter translucent>
         <IonToolbar color="secondary">
           <IonSegment value="all">

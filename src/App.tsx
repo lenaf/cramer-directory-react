@@ -55,34 +55,21 @@ const AppContent: React.FC = () => {
 
         <IonContent>
           <IonList>
-            <IonItem button>
-              <IonIcon slot="start" icon={home}></IonIcon>
-              <IonLabel>Home</IonLabel>
-            </IonItem>
+            <IonListHeader>Navigate</IonListHeader>
+            {ROUTES.map((route) => (
+              <IonMenuToggle key={route.id} autoHide={false}>
+                <IonItem button routerLink={route.path}>
+                  <IonIcon slot="start" icon={route.icon} />
+                  <IonLabel>{route.label}</IonLabel>
+                </IonItem>
+              </IonMenuToggle>
+            ))}
           </IonList>
         </IonContent>
       </IonMenu>
 
       {/* MAIN */}
       <div className="ion-page" id="split-plane-content">
-        {/* HEADER */}
-        <IonHeader>
-          <IonToolbar color="secondary">
-            <IonButtons slot="start">
-              <IonMenuToggle>
-                <IonButton>
-                  <IonIcon slot="icon-only" icon={menu}></IonIcon>
-                </IonButton>
-              </IonMenuToggle>
-            </IonButtons>
-            <IonTitle>
-              <strong className="ion-text-uppercase">
-                {currentRoute.label}
-              </strong>
-            </IonTitle>
-          </IonToolbar>
-        </IonHeader>
-
         {/* ROUTING AND MAIN CONTENT */}
         <IonContent className="ion-padding">
           <IonTabs>
