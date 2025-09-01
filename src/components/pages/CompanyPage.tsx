@@ -6,7 +6,6 @@ import {
   IonTitle,
   IonToolbar,
   IonButtons,
-  IonMenuButton,
   IonSearchbar,
   IonList,
   IonItemGroup,
@@ -96,7 +95,11 @@ const CompanyPage: React.FC = () => {
       <IonHeader>
         <IonToolbar color="secondary">
           <IonButtons slot="start">
-            <IonMenuButton menu="main-menu" />
+            <IonMenuToggle>
+              <IonButton>
+                <IonIcon slot="icon-only" icon={menu}></IonIcon>
+              </IonButton>
+            </IonMenuToggle>{" "}
           </IonButtons>
           <IonTitle>
             <strong className="ion-text-uppercase">
