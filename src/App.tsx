@@ -20,6 +20,7 @@ import "./global.scss";
 import { Redirect, Route, useLocation } from "react-router-dom";
 import { ROUTES } from "./routes";
 import SideMenu from "./components/SideMenu";
+import CompanyDetailPage from "./components/pages/CompanyDetailPage";
 
 setupIonicReact();
 export const SPLIT_PLANE_CONTENT_ID = "split-plane-content";
@@ -46,6 +47,7 @@ const AppContent: React.FC = () => {
                   component={route.component}
                 />
               ))}
+              <Route exact path="/company/:id" component={CompanyDetailPage} />
               <Route exact path="/" render={() => <Redirect to="/home" />} />
             </IonRouterOutlet>
 
