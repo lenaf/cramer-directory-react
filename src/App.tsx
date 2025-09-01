@@ -1,30 +1,13 @@
 import React from "react";
 import {
-  IonButton,
-  IonButtons,
-  IonHeader,
-  IonListHeader,
-  IonMenuToggle,
   IonRouterOutlet,
   IonSplitPane,
   IonTabBar,
   IonTabButton,
   IonTabs,
-  IonTitle,
-  IonToolbar,
   setupIonicReact,
 } from "@ionic/react";
-import {
-  IonApp,
-  IonMenu,
-  IonContent,
-  IonImg,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonIcon,
-} from "@ionic/react";
-import { home, menu } from "ionicons/icons";
+import { IonApp, IonContent, IonLabel, IonIcon } from "@ionic/react";
 
 import { IonReactRouter } from "@ionic/react-router";
 
@@ -36,8 +19,10 @@ import "./theme/variables.scss"; // must be imported after ionic core for preced
 import "./global.scss";
 import { Redirect, Route, useLocation } from "react-router-dom";
 import { ROUTES } from "./routes";
+import SideMenu from "./components/SideMenu";
 
 setupIonicReact();
+export const SPLIT_PLANE_CONTENT_ID = "split-plane-content";
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -45,31 +30,10 @@ const AppContent: React.FC = () => {
     ROUTES.find((t) => t.path === location.pathname) || ROUTES[0];
 
   return (
-    <IonSplitPane when="sm" contentId="split-plane-content">
-      {/* SIDE MENU */}
-
-      <IonMenu contentId="split-plane-content">
-        <IonHeader className="bg-secondary h-16 flex px-8 py-2">
-          <IonImg src="/assets/branding/logo.png" alt="logo" />
-        </IonHeader>
-
-        <IonContent>
-          <IonList>
-            <IonListHeader>Navigate</IonListHeader>
-            {ROUTES.map((route) => (
-              <IonMenuToggle key={route.id} autoHide={false}>
-                <IonItem button routerLink={route.path}>
-                  <IonIcon slot="start" icon={route.icon} />
-                  <IonLabel>{route.label}</IonLabel>
-                </IonItem>
-              </IonMenuToggle>
-            ))}
-          </IonList>
-        </IonContent>
-      </IonMenu>
-
+    <IonSplitPane when="sm" contentId={SPLIT_PLANE_CONTENT_ID}>
+      <SideMenu />
       {/* MAIN */}
-      <div className="ion-page" id="split-plane-content">
+      <div className="ion-page" id={SPLIT_PLANE_CONTENT_ID}>
         {/* ROUTING AND MAIN CONTENT */}
         <IonContent className="ion-padding">
           <IonTabs>
@@ -86,12 +50,29 @@ const AppContent: React.FC = () => {
             </IonRouterOutlet>
 
             <IonTabBar slot="bottom" color="secondary">
-              {ROUTES.map((route) => (
-                <IonTabButton key={route.id} tab={route.id} href={route.path}>
-                  <IonIcon icon={route.icon} />
-                  <IonLabel>{route.label}</IonLabel>
-                </IonTabButton>
-              ))}
+              {ROUTES.map((route) => {
+                const isActive = currentRoute.path === route.path;
+                return (
+                  <IonTabButton
+                    key={route.id}
+                    tab={route.id}
+                    href={route.path}
+                    className={
+                      isActive ? "bg-white bg-opacity-20 font-bold" : ""
+                    }
+                  >
+                    <IonIcon
+                      icon={route.icon}
+                      className={isActive ? "text-white" : ""}
+                    />
+                    <IonLabel
+                      className={isActive ? "text-white font-bold" : ""}
+                    >
+                      {route.label}
+                    </IonLabel>
+                  </IonTabButton>
+                );
+              })}
             </IonTabBar>
           </IonTabs>
         </IonContent>
