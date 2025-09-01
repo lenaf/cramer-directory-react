@@ -1,25 +1,32 @@
-import React from 'react';
-import { 
-  IonCard, 
-  IonCardHeader, 
-  IonCardTitle, 
-  IonCardSubtitle, 
+import React from "react";
+import {
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
   IonCardContent,
-  IonButton
-} from '@ionic/react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import { useEvents } from '../../hooks/useEvents';
+  IonButton,
+} from "@ionic/react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import { useEvents } from "../../hooks/useEvents";
 
 const EventWidget: React.FC = () => {
   const { data: events, loading, error } = useEvents();
 
-  console.log('EventWidget - loading:', loading, 'events:', events, 'error:', error);
+  console.log(
+    "EventWidget - loading:",
+    loading,
+    "events:",
+    events,
+    "error:",
+    error
+  );
 
   const openLink = (url: string) => {
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
 
   if (loading) {
@@ -61,18 +68,56 @@ const EventWidget: React.FC = () => {
             spaceBetween={10}
             pagination={{ clickable: true }}
             modules={[Pagination]}
+            style={{ paddingBottom: "30px" }}
           >
             {events.map((event) => (
-              <SwiperSlide key={event.id}>
-                <img src={event.imageURL} />
-                <div className="slide-content">
-                  <div className="subtitle">
-                    {event.startDate ? new Date(event.startDate.seconds * 1000).toLocaleDateString() : ''}
+              <SwiperSlide
+                key={event.id}
+                style={{
+                  position: "relative",
+                  color: "#fff",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                }}
+              >
+                <img
+                  src={event.imageURL}
+                  alt={event.title}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                />
+                <div
+                  className="slide-content"
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    width: "100%",
+                    height: "100%",
+                    padding: "4%",
+                    background: "rgba(0,0,0,0.65)",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  <div className="subtitle" style={{ fontSize: "12px" }}>
+                    {event.startDate
+                      ? new Date(
+                          event.startDate.seconds * 1000
+                        ).toLocaleDateString()
+                      : ""}
                   </div>
-                  <div className="title">
+                  <div
+                    className="title"
+                    style={{ fontSize: "16px", fontWeight: 300, lineHeight: 1 }}
+                  >
                     {event.title}
                   </div>
-                  <div className="subtitle">
+                  <div className="subtitle" style={{ fontSize: "12px" }}>
                     {event.location.city}, {event.location.state}
                   </div>
                 </div>
@@ -83,7 +128,11 @@ const EventWidget: React.FC = () => {
       )}
 
       <div className="ion-padding-horizontal ion-padding-bottom">
-        <IonButton fill="clear" expand="block" onClick={() => openLink('https://www.jackcramer.com/roundtables')}>
+        <IonButton
+          fill="clear"
+          expand="block"
+          onClick={() => openLink("https://www.jackcramer.com/roundtables")}
+        >
           View All Events
         </IonButton>
       </div>

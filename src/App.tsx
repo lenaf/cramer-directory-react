@@ -1,105 +1,128 @@
-import React, { useEffect } from "react";
-import { setupIonicReact } from "@ionic/react";
+import React from "react";
+import {
+  IonButton,
+  IonButtons,
+  IonHeader,
+  IonListHeader,
+  IonMenuToggle,
+  IonRouterOutlet,
+  IonSplitPane,
+  IonTabBar,
+  IonTabButton,
+  IonTabs,
+  IonTitle,
+  IonToolbar,
+  setupIonicReact,
+} from "@ionic/react";
 import {
   IonApp,
   IonMenu,
   IonContent,
   IonImg,
   IonList,
-  IonItemGroup,
   IonItem,
   IonLabel,
   IonIcon,
 } from "@ionic/react";
+import { home, menu } from "ionicons/icons";
 
 import { IonReactRouter } from "@ionic/react-router";
-
-import { Browser } from "@capacitor/browser";
-import { menuController } from "@ionic/core/components";
 
 import "@ionic/react/css/core.css";
 
 import { AuthProvider } from "./contexts/AuthContext";
-import { NavigationProvider } from "./contexts/NavigationContext";
-import TabsLayout from "./components/TabsLayout";
-import { useNavigation } from "./hooks/useNavigation";
 
 import "./theme/variables.scss"; // must be imported after ionic core for precedence
 import "./global.scss";
+import { Redirect, Route, useLocation } from "react-router-dom";
+import { ROUTES } from "./routes";
 
 setupIonicReact();
 
 const AppContent: React.FC = () => {
-  const { data: navigation } = useNavigation();
-
-  useEffect(() => {
-    const waitForTabs = () => {
-      const tabs = document.querySelector("ion-tabs");
-      if (tabs) {
-        tabs.id = "main-content";
-        // Wait a bit more to ensure the element is fully ready
-        setTimeout(() => {
-          menuController.enable(true, "main-menu");
-        }, 100);
-      } else {
-        // Keep checking until tabs are found
-        setTimeout(waitForTabs, 100);
-      }
-    };
-    waitForTabs();
-  }, []);
-
-  const handleNavigationClick = async (item: any) => {
-    if (item.isExternalLink) {
-      await Browser.open({ url: item.link });
-    }
-  };
+  const location = useLocation();
+  const currentRoute =
+    ROUTES.find((t) => t.path === location.pathname) || ROUTES[0];
 
   return (
-    <>
-      <IonMenu contentId="main-content" menuId="main-menu" type="overlay">
+    <IonSplitPane when="sm" contentId="split-plane-content">
+      {/* SIDE MENU */}
+
+      <IonMenu contentId="split-plane-content">
+        <IonHeader className="bg-secondary h-16 flex px-8 py-2">
+          <IonImg src="/assets/branding/logo.png" alt="logo" />
+        </IonHeader>
+
         <IonContent>
-          <IonImg
-            src="/assets/branding/logo.png"
-            alt="The Wisconsin State Capitol building in Madison, WI at night"
-            style={{ padding: "32px 96px" }}
-          />
           <IonList>
-            {navigation && (
-              <IonItemGroup>
-                {navigation.map((item, index) => (
-                  <IonItem
-                    key={index}
-                    onClick={() => handleNavigationClick(item)}
-                  >
-                    <IonLabel>{item.title}</IonLabel>
-                    {item.isExternalLink && (
-                      <IonIcon name="open-outline" slot="end" />
-                    )}
-                  </IonItem>
-                ))}
-              </IonItemGroup>
-            )}
+            <IonItem button>
+              <IonIcon slot="start" icon={home}></IonIcon>
+              <IonLabel>Home</IonLabel>
+            </IonItem>
           </IonList>
         </IonContent>
       </IonMenu>
-      <TabsLayout />
-    </>
+
+      {/* MAIN */}
+      <div className="ion-page" id="split-plane-content">
+        {/* HEADER */}
+        <IonHeader>
+          <IonToolbar color="secondary">
+            <IonButtons slot="start">
+              <IonMenuToggle>
+                <IonButton>
+                  <IonIcon slot="icon-only" icon={menu}></IonIcon>
+                </IonButton>
+              </IonMenuToggle>
+            </IonButtons>
+            <IonTitle>
+              <strong className="ion-text-uppercase">
+                {currentRoute.label}
+              </strong>
+            </IonTitle>
+          </IonToolbar>
+        </IonHeader>
+
+        {/* ROUTING AND MAIN CONTENT */}
+        <IonContent className="ion-padding">
+          <IonTabs>
+            <IonRouterOutlet>
+              {ROUTES.map((route) => (
+                <Route
+                  key={route.id}
+                  exact
+                  path={route.path}
+                  component={route.component}
+                />
+              ))}
+              <Route exact path="/" render={() => <Redirect to="/home" />} />
+            </IonRouterOutlet>
+
+            <IonTabBar slot="bottom" color="secondary">
+              {ROUTES.map((route) => (
+                <IonTabButton key={route.id} tab={route.id} href={route.path}>
+                  <IonIcon icon={route.icon} />
+                  <IonLabel>{route.label}</IonLabel>
+                </IonTabButton>
+              ))}
+            </IonTabBar>
+          </IonTabs>
+        </IonContent>
+      </div>
+    </IonSplitPane>
   );
 };
 
-function App() {
+const App: React.FC = () => {
   return (
     <IonApp>
       <AuthProvider>
-        <NavigationProvider>
-          <IonReactRouter>
-            <AppContent />
-          </IonReactRouter>
-        </NavigationProvider>
+        <IonReactRouter>
+          <AppContent />
+        </IonReactRouter>
       </AuthProvider>
     </IonApp>
   );
-}
+};
 
 export default App;
