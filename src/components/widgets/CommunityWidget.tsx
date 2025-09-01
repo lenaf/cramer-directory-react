@@ -1,16 +1,27 @@
-import React from 'react';
-import { 
-  IonCard, 
-  IonCardHeader, 
-  IonCardTitle, 
-  IonCardContent
-} from '@ionic/react';
-import { useCommunity } from '../../hooks/useContent';
+import React from "react";
+import {
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+} from "@ionic/react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import { useCommunity } from "../../hooks/useContent";
 
 const CommunityWidget: React.FC = () => {
   const { data: communities, loading, error } = useCommunity();
 
-  console.log('CommunityWidget - loading:', loading, 'communities:', communities, 'error:', error);
+  console.log(
+    "CommunityWidget - loading:",
+    loading,
+    "communities:",
+    communities,
+    "error:",
+    error
+  );
 
   if (loading) {
     return (
@@ -28,26 +39,22 @@ const CommunityWidget: React.FC = () => {
         <IonCardTitle>Cramer Community</IonCardTitle>
       </IonCardHeader>
 
-      <IonCardContent>
-        {communities && communities.length > 0 ? (
-          <div style={{ display: 'flex', gap: '10px', overflowX: 'auto' }}>
+      {communities && communities.length > 0 && (
+        <IonCardContent>
+          <Swiper
+            slidesPerView={3}
+            spaceBetween={10}
+            pagination={{ clickable: true }}
+            modules={[Pagination]}
+          >
             {communities.map((community) => (
-              <div key={community.id} style={{ minWidth: '120px', textAlign: 'center' }}>
-                <img 
-                  src={community.imageURL} 
-                  alt={community.name}
-                  style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
-                />
-                <div style={{ marginTop: '8px', fontWeight: 'bold', fontSize: '0.9em' }}>
-                  {community.name}
-                </div>
-              </div>
+              <SwiperSlide key={community.id}>
+                <img src={community.imageURL} />
+              </SwiperSlide>
             ))}
-          </div>
-        ) : (
-          <p>No community content available</p>
-        )}
-      </IonCardContent>
+          </Swiper>
+        </IonCardContent>
+      )}
     </IonCard>
   );
 };

@@ -1,41 +1,52 @@
-import React, { useEffect } from 'react';
-import { setupIonicReact } from '@ionic/react';
-import { 
-  IonApp, 
-  IonSplitPane, 
-  IonMenu, 
-  IonContent, 
-  IonImg, 
-  IonList, 
-  IonItemGroup, 
-  IonItem, 
-  IonLabel, 
+import React, { useEffect } from "react";
+import { setupIonicReact } from "@ionic/react";
+import {
+  IonApp,
+  IonMenu,
+  IonContent,
+  IonImg,
+  IonList,
+  IonItemGroup,
+  IonItem,
+  IonLabel,
   IonIcon,
-  IonSpinner 
-} from '@ionic/react';
-import { menuController } from '@ionic/core/components';
-import { IonReactRouter } from '@ionic/react-router';
-import { openOutline } from 'ionicons/icons';
-import { Browser } from '@capacitor/browser';
+} from "@ionic/react";
 
-import '@ionic/react/css/core.css';
+import { IonReactRouter } from "@ionic/react-router";
 
-import { AuthProvider } from './contexts/AuthContext';
-import { NavigationProvider } from './contexts/NavigationContext';
-import TabsLayout from './components/TabsLayout';
-import { useNavigation } from './hooks/useNavigation';
+import { Browser } from "@capacitor/browser";
+import { menuController } from "@ionic/core/components";
 
-import './theme/variables.scss';
-import './global.scss';
+import "@ionic/react/css/core.css";
+
+import { AuthProvider } from "./contexts/AuthContext";
+import { NavigationProvider } from "./contexts/NavigationContext";
+import TabsLayout from "./components/TabsLayout";
+import { useNavigation } from "./hooks/useNavigation";
+
+import "./theme/variables.scss"; // must be imported after ionic core for precedence
+import "./global.scss";
 
 setupIonicReact();
 
 const AppContent: React.FC = () => {
-  const { data: navigation, loading } = useNavigation();
+  const { data: navigation } = useNavigation();
 
   useEffect(() => {
-    // Enable the menu when the component mounts
-    menuController.enable(true, 'main-menu');
+    const waitForTabs = () => {
+      const tabs = document.querySelector("ion-tabs");
+      if (tabs) {
+        tabs.id = "main-content";
+        // Wait a bit more to ensure the element is fully ready
+        setTimeout(() => {
+          menuController.enable(true, "main-menu");
+        }, 100);
+      } else {
+        // Keep checking until tabs are found
+        setTimeout(waitForTabs, 100);
+      }
+    };
+    waitForTabs();
   }, []);
 
   const handleNavigationClick = async (item: any) => {
@@ -45,37 +56,35 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <IonSplitPane contentId="main-content" when="lg">
+    <>
       <IonMenu contentId="main-content" menuId="main-menu" type="overlay">
         <IonContent>
           <IonImg
             src="/assets/branding/logo.png"
-            alt="Logo"
+            alt="The Wisconsin State Capitol building in Madison, WI at night"
+            style={{ padding: "32px 96px" }}
           />
-
-          {loading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
-              <IonSpinner />
-            </div>
-          ) : (
-            <IonList>
+          <IonList>
+            {navigation && (
               <IonItemGroup>
                 {navigation.map((item, index) => (
-                  <IonItem key={item.id || index} button onClick={() => handleNavigationClick(item)}>
+                  <IonItem
+                    key={index}
+                    onClick={() => handleNavigationClick(item)}
+                  >
                     <IonLabel>{item.title}</IonLabel>
                     {item.isExternalLink && (
-                      <IonIcon icon={openOutline} slot="end" />
+                      <IonIcon name="open-outline" slot="end" />
                     )}
                   </IonItem>
                 ))}
               </IonItemGroup>
-            </IonList>
-          )}
+            )}
+          </IonList>
         </IonContent>
       </IonMenu>
-
       <TabsLayout />
-    </IonSplitPane>
+    </>
   );
 };
 

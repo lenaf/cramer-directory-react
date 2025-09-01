@@ -1,17 +1,29 @@
-import React from 'react';
-import { 
-  IonCard, 
-  IonCardHeader, 
-  IonCardTitle, 
-  IonCardSubtitle, 
-  IonCardContent
-} from '@ionic/react';
-import { usePillars } from '../../hooks/useContent';
+import React from "react";
+import {
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
+  IonCardContent,
+} from "@ionic/react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+
+import { usePillars } from "../../hooks/useContent";
 
 const PillarWidget: React.FC = () => {
   const { data: pillars, loading, error } = usePillars();
 
-  console.log('PillarWidget - loading:', loading, 'pillars:', pillars, 'error:', error);
+  console.log(
+    "PillarWidget - loading:",
+    loading,
+    "pillars:",
+    pillars,
+    "error:",
+    error
+  );
 
   if (loading) {
     return (
@@ -31,26 +43,22 @@ const PillarWidget: React.FC = () => {
         <IonCardSubtitle>Cramer & Associates</IonCardSubtitle>
       </IonCardHeader>
 
-      <IonCardContent>
-        {pillars && pillars.length > 0 ? (
-          <div style={{ display: 'flex', gap: '10px', overflowX: 'auto' }}>
+      {pillars && pillars.length > 0 && (
+        <IonCardContent>
+          <Swiper
+            slidesPerView={4}
+            spaceBetween={10}
+            // pagination={{ clickable: true }}
+            modules={[Pagination]}
+          >
             {pillars.map((pillar) => (
-              <div key={pillar.id} style={{ minWidth: '120px', textAlign: 'center' }}>
-                <img 
-                  src={pillar.imageURL} 
-                  alt={pillar.name}
-                  style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
-                />
-                <div style={{ marginTop: '8px', fontWeight: 'bold', fontSize: '0.9em' }}>
-                  {pillar.name}
-                </div>
-              </div>
+              <SwiperSlide key={pillar.id}>
+                <img alt={pillar.name} src={pillar.imageURL} />
+              </SwiperSlide>
             ))}
-          </div>
-        ) : (
-          <p>No pillars available</p>
-        )}
-      </IonCardContent>
+          </Swiper>
+        </IonCardContent>
+      )}
     </IonCard>
   );
 };

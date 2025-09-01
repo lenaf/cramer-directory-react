@@ -4,6 +4,7 @@ import {
   IonCardContent
 } from '@ionic/react';
 import { AdTypeTypes } from '../../types/Ad';
+import { useRandomAdByType } from '../../hooks/useContent';
 
 interface AdWidgetProps {
   className?: string;
@@ -11,15 +12,52 @@ interface AdWidgetProps {
 }
 
 const AdWidget: React.FC<AdWidgetProps> = ({ className, type }) => {
+  const { data: ad, loading, error } = useRandomAdByType(type);
+
+  const openLink = (url: string) => {
+    window.open(url, '_blank');
+  };
+
+  if (loading) {
+    return (
+      <div className={className}>
+        <IonCard>
+          <IonCardContent>
+            <div className="text-center p-5 bg-gray-100 rounded-lg">
+              <p className="m-0 text-gray-600">Loading advertisement...</p>
+            </div>
+          </IonCardContent>
+        </IonCard>
+      </div>
+    );
+  }
+
+  if (error || !ad) {
+    return (
+      <div className={className}>
+        <IonCard>
+          <IonCardContent>
+            <div className="text-center p-5 bg-gray-100 rounded-lg">
+              <p className="m-0 text-gray-600">Advertisement Space ({type})</p>
+            </div>
+          </IonCardContent>
+        </IonCard>
+      </div>
+    );
+  }
+
   return (
     <div className={className}>
-      <IonCard>
-        <IonCardContent>
-          <div style={{ textAlign: 'center', padding: '20px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
-            <p style={{ margin: 0, color: '#666' }}>Advertisement Space ({type})</p>
-          </div>
-        </IonCardContent>
-      </IonCard>
+      <div 
+        onClick={() => openLink(ad.linkURL)}
+        className="cursor-pointer"
+      >
+        <img 
+          src={ad.imageURL} 
+          alt={ad.name}
+          className="w-full h-auto rounded-lg shadow-md"
+        />
+      </div>
     </div>
   );
 };

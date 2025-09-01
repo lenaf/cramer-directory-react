@@ -7,6 +7,10 @@ import {
   IonCardContent,
   IonButton
 } from '@ionic/react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
 import { useEvents } from '../../hooks/useEvents';
 
 const EventWidget: React.FC = () => {
@@ -50,32 +54,33 @@ const EventWidget: React.FC = () => {
         <IonCardSubtitle>Upcoming Roundtables</IonCardSubtitle>
       </IonCardHeader>
 
-      <IonCardContent>
-        {events && events.length > 0 ? (
-          <div style={{ display: 'flex', gap: '10px', overflowX: 'auto' }}>
+      {events && events.length > 0 && (
+        <IonCardContent>
+          <Swiper
+            slidesPerView={2}
+            spaceBetween={10}
+            pagination={{ clickable: true }}
+            modules={[Pagination]}
+          >
             {events.map((event) => (
-              <div key={event.id} style={{ minWidth: '200px', textAlign: 'center' }}>
-                <img 
-                  src={event.imageURL} 
-                  alt={event.title}
-                  style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px' }}
-                />
-                <div style={{ marginTop: '8px' }}>
-                  <div style={{ fontSize: '0.8em', color: '#666' }}>
+              <SwiperSlide key={event.id}>
+                <img src={event.imageURL} />
+                <div className="slide-content">
+                  <div className="subtitle">
                     {event.startDate ? new Date(event.startDate.seconds * 1000).toLocaleDateString() : ''}
                   </div>
-                  <div style={{ fontWeight: 'bold', margin: '4px 0' }}>{event.title}</div>
-                  <div style={{ fontSize: '0.8em', color: '#666' }}>
+                  <div className="title">
+                    {event.title}
+                  </div>
+                  <div className="subtitle">
                     {event.location.city}, {event.location.state}
                   </div>
                 </div>
-              </div>
+              </SwiperSlide>
             ))}
-          </div>
-        ) : (
-          <p>No events available</p>
-        )}
-      </IonCardContent>
+          </Swiper>
+        </IonCardContent>
+      )}
 
       <div className="ion-padding-horizontal ion-padding-bottom">
         <IonButton fill="clear" expand="block" onClick={() => openLink('https://www.jackcramer.com/roundtables')}>
