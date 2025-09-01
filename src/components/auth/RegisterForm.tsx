@@ -3,134 +3,160 @@ import {
   IonButton,
   IonInput,
   IonItem,
-  IonLabel,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonSpinner,
-  IonToast
+  IonList,
+  IonIcon,
+  IonRow,
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonButtons
 } from '@ionic/react';
+import { informationCircleOutline } from 'ionicons/icons';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface RegisterFormProps {
-  onSuccess?: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
-  const { authService } = useAuth();
+const RegisterForm: React.FC<RegisterFormProps> = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [showToast, setShowToast] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
+  const { authService } = useAuth();
 
-  const validateForm = () => {
-    if (!email || !password || !confirmPassword) {
-      setError('All fields are required');
-      return false;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return false;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return false;
-    }
-
-    return true;
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
-      setShowToast(true);
-      return;
+    const newErrors: { email?: string; password?: string; confirmPassword?: string } = {};
+    
+    if (!email) {
+      newErrors.email = 'Email is required';
+    } else if (!validateEmail(email)) {
+      newErrors.email = 'Please enter a valid email';
     }
-
-    setLoading(true);
-    setError('');
-
-    try {
-      await authService.createUserWithEmailAndPassword(email, password);
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
-      onSuccess?.();
-    } catch (err: any) {
-      setError(err.message || 'Failed to create account');
-      setShowToast(true);
-    } finally {
-      setLoading(false);
+    
+    if (!password) {
+      newErrors.password = 'Password is required';
+    } else if (password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    setErrors(newErrors);
+    
+    if (Object.keys(newErrors).length === 0) {
+      try {
+        await authService.createUserWithEmailAndPassword(email, password);
+        onClose();
+      } catch (error) {
+        console.error('Registration error:', error);
+        setErrors({ email: 'Registration failed. Please try again.' });
+      }
     }
   };
 
   return (
-    <IonCard>
-      <IonCardHeader>
-        <IonCardTitle>Create Account</IonCardTitle>
-      </IonCardHeader>
-      <IonCardContent>
+    <IonModal isOpen={isOpen} onDidDismiss={onClose}>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>Sign Up</IonTitle>
+          <IonButtons slot="end">
+            <IonButton fill="clear" onClick={onClose}>
+              Close
+            </IonButton>
+          </IonButtons>
+        </IonToolbar>
+      </IonHeader>
+      
+      <IonContent className="ion-padding">
         <form onSubmit={handleSubmit}>
-          <IonItem>
-            <IonLabel position="stacked">Email</IonLabel>
-            <IonInput
-              type="email"
-              value={email}
-              placeholder="Enter your email"
-              onIonInput={(e) => setEmail(e.detail.value!)}
-              required
-              disabled={loading}
-            />
-          </IonItem>
+          <IonList className="inputs-list">
+            <IonItem className="input-item">
+              <IonInput
+                type="email"
+                placeholder="Email"
+                value={email}
+                onIonInput={(e) => setEmail(e.detail.value!)}
+                clearInput
+                autocapitalize="off"
+              />
+            </IonItem>
+            {errors.email && (
+              <div className="error-container">
+                <div className="error-message">
+                  <IonIcon icon={informationCircleOutline} />
+                  <span>{errors.email}</span>
+                </div>
+              </div>
+            )}
 
-          <IonItem>
-            <IonLabel position="stacked">Password</IonLabel>
-            <IonInput
-              type="password"
-              value={password}
-              placeholder="Enter your password (min 6 characters)"
-              onIonInput={(e) => setPassword(e.detail.value!)}
-              required
-              disabled={loading}
-            />
-          </IonItem>
+            <IonItem className="input-item">
+              <IonInput
+                type="password"
+                placeholder="Password"
+                value={password}
+                onIonInput={(e) => setPassword(e.detail.value!)}
+              />
+            </IonItem>
+            {errors.password && (
+              <div className="error-container">
+                <div className="error-message">
+                  <IonIcon icon={informationCircleOutline} />
+                  <span>{errors.password}</span>
+                </div>
+              </div>
+            )}
 
-          <IonItem>
-            <IonLabel position="stacked">Confirm Password</IonLabel>
-            <IonInput
-              type="password"
-              value={confirmPassword}
-              placeholder="Confirm your password"
-              onIonInput={(e) => setConfirmPassword(e.detail.value!)}
-              required
-              disabled={loading}
-            />
-          </IonItem>
+            <IonItem className="input-item">
+              <IonInput
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onIonInput={(e) => setConfirmPassword(e.detail.value!)}
+              />
+            </IonItem>
+            {errors.confirmPassword && (
+              <div className="error-container">
+                <div className="error-message">
+                  <IonIcon icon={informationCircleOutline} />
+                  <span>{errors.confirmPassword}</span>
+                </div>
+              </div>
+            )}
+          </IonList>
 
           <IonButton
-            expand="block"
+            className="signup-btn"
             type="submit"
-            disabled={loading}
-            style={{ marginTop: '20px' }}
+            expand="block"
+            disabled={!email || !password || !confirmPassword}
           >
-            {loading ? <IonSpinner name="crescent" /> : 'Create Account'}
+            Continue
           </IonButton>
-        </form>
 
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message={error}
-          duration={3000}
-          color="danger"
-        />
-      </IonCardContent>
-    </IonCard>
+          <IonRow className="other-auth-options-row">
+            <IonButton className="login-btn" fill="clear" onClick={onClose}>
+              Already have an account?
+            </IonButton>
+          </IonRow>
+        </form>
+      </IonContent>
+    </IonModal>
   );
 };
+
+export default RegisterForm;

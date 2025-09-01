@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   IonContent,
   IonPage,
@@ -9,32 +9,32 @@ import {
   IonSegmentButton,
   IonLabel,
   IonButton,
-  IonText
-} from '@ionic/react';
-import { LoginForm } from '../auth/LoginForm';
-import { RegisterForm } from '../auth/RegisterForm';
-import { useAuth } from '../../contexts/AuthContext';
+  IonText,
+} from "@ionic/react";
+import LoginForm from "../auth/LoginForm";
+import RegisterForm from "../auth/RegisterForm";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const AuthPage: React.FC = () => {
   const { authService } = useAuth();
-  const [segment, setSegment] = useState<'login' | 'register'>('login');
+  const [segment, setSegment] = useState<"login" | "register">("login");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [resetMessage, setResetMessage] = useState('');
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
 
   const handlePasswordReset = async () => {
     if (!resetEmail) {
-      setResetMessage('Please enter your email address');
+      setResetMessage("Please enter your email address");
       return;
     }
 
     try {
       await authService.sendPasswordResetEmail(resetEmail);
-      setResetMessage('Password reset email sent! Check your inbox.');
+      setResetMessage("Password reset email sent! Check your inbox.");
       setShowForgotPassword(false);
-      setResetEmail('');
+      setResetEmail("");
     } catch (error: any) {
-      setResetMessage(error.message || 'Failed to send password reset email');
+      setResetMessage(error.message || "Failed to send password reset email");
     }
   };
 
@@ -48,7 +48,9 @@ export const AuthPage: React.FC = () => {
       <IonContent className="ion-padding">
         <IonSegment
           value={segment}
-          onIonChange={(e) => setSegment(e.detail.value as 'login' | 'register')}
+          onIonChange={(e) =>
+            setSegment(e.detail.value as "login" | "register")
+          }
         >
           <IonSegmentButton value="login">
             <IonLabel>Sign In</IonLabel>
@@ -58,11 +60,11 @@ export const AuthPage: React.FC = () => {
           </IonSegmentButton>
         </IonSegment>
 
-        <div style={{ marginTop: '20px' }}>
-          {segment === 'login' ? (
+        <div style={{ marginTop: "20px" }}>
+          {segment === "login" ? (
             <>
-              <LoginForm />
-              <div style={{ textAlign: 'center', marginTop: '10px' }}>
+              <LoginForm isOpen={true} onClose={() => {}} />
+              <div style={{ textAlign: "center", marginTop: "10px" }}>
                 <IonButton
                   fill="clear"
                   size="small"
@@ -73,19 +75,26 @@ export const AuthPage: React.FC = () => {
               </div>
             </>
           ) : (
-            <RegisterForm />
+            <RegisterForm isOpen={true} onClose={() => {}} />
           )}
         </div>
 
         {showForgotPassword && (
-          <div style={{ marginTop: '20px', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
+          <div
+            style={{
+              marginTop: "20px",
+              padding: "20px",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+            }}
+          >
             <h3>Reset Password</h3>
             <input
               type="email"
               placeholder="Enter your email"
               value={resetEmail}
               onChange={(e) => setResetEmail(e.target.value)}
-              style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
             />
             <div>
               <IonButton onClick={handlePasswordReset}>
@@ -99,7 +108,9 @@ export const AuthPage: React.FC = () => {
               </IonButton>
             </div>
             {resetMessage && (
-              <IonText color={resetMessage.includes('sent') ? 'success' : 'danger'}>
+              <IonText
+                color={resetMessage.includes("sent") ? "success" : "danger"}
+              >
                 <p>{resetMessage}</p>
               </IonText>
             )}
