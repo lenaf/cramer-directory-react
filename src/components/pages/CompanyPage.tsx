@@ -26,6 +26,7 @@ import {
 import { useCompanySearch } from "../../hooks/useCompanies";
 import { Company } from "../../types/Company";
 import { menu } from "ionicons/icons";
+import { cacheEntityName } from "../../utils/cache";
 
 const CompanyPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -164,7 +165,11 @@ const CompanyPage: React.FC = () => {
                     <IonLabel>{letter}</IonLabel>
                   </IonItemDivider>
 
-                  {groupedCompanies[letter].map((company) => (
+                  {groupedCompanies[letter].map((company) => {
+                    // Cache company name for navigation
+                    cacheEntityName(company.id, company.name);
+                    
+                    return (
                     <IonItem
                       key={company.id}
                       button
@@ -208,7 +213,8 @@ const CompanyPage: React.FC = () => {
                         )}
                       </IonLabel>
                     </IonItem>
-                  ))}
+                    );
+                  })}
                 </IonItemGroup>
               ))}
           </IonList>

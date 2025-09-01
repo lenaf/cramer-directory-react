@@ -25,6 +25,7 @@ import {
 import { usePeople } from "../../hooks/usePeople";
 import { Person } from "../../types/Person";
 import { menu } from "ionicons/icons";
+import { cacheEntityName } from "../../utils/cache";
 
 const PeoplePage: React.FC = () => {
   const { data: people, loading, error } = usePeople();
@@ -107,8 +108,17 @@ const PeoplePage: React.FC = () => {
                     <IonLabel>{letter}</IonLabel>
                   </IonItemDivider>
 
-                  {groupedPeople[letter].map((person) => (
-                    <IonItem key={person.id} button>
+                  {groupedPeople[letter].map((person) => {
+                    // Cache person name for navigation
+                    const fullName = `${person.firstName} ${person.lastName}`.trim();
+                    cacheEntityName(person.id, fullName);
+                    
+                    return (
+                    <IonItem
+                      key={person.id}
+                      button
+                      routerLink={`/people/${person.id}`}
+                    >
                       <IonAvatar slot="start">
                         <IonImg
                           src={
@@ -140,7 +150,8 @@ const PeoplePage: React.FC = () => {
                         {person.jobTitle && <p>{person.jobTitle}</p>}
                       </IonLabel>
                     </IonItem>
-                  ))}
+                    );
+                  })}
                 </IonItemGroup>
               ))}
           </IonList>
