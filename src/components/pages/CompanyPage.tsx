@@ -174,12 +174,12 @@ const CompanyPage: React.FC = () => {
                         <IonImg
                           src={
                             company.logoURL ||
-                            "./assets/placeholders/business-outline.svg"
+                            "/assets/placeholders/business-outline.svg"
                           }
                           alt={`${company.name} logo`}
                           onIonError={(e) => {
                             (e.target as HTMLIonImgElement).src =
-                              "./assets/placeholders/business-outline.svg";
+                              "/assets/placeholders/business-outline.svg";
                           }}
                         />
                       </IonThumbnail>

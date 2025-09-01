@@ -87,9 +87,13 @@ const ProfilePage: React.FC = () => {
                 <IonImg
                   src={
                     auth.user?.photoURL ||
-                    "./assets/placeholders/person-circle-outline.svg"
+                    "/assets/placeholders/person-circle-outline.svg"
                   }
                   alt="profile"
+                  onIonError={(e) => {
+                    (e.target as HTMLIonImgElement).src =
+                      "/assets/placeholders/person-circle-outline.svg";
+                  }}
                 />
               </IonAvatar>
               <h2>{auth.user?.displayName || "User"}</h2>

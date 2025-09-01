@@ -114,12 +114,12 @@ const PeoplePage: React.FC = () => {
                           src={
                             person.imageURL ||
                             person.photoURL ||
-                            "./assets/placeholders/person-circle-outline.svg"
+                            "/assets/placeholders/person-circle-outline.svg"
                           }
                           alt="avatar"
                           onIonError={(e) => {
                             (e.target as HTMLIonImgElement).src =
-                              "./assets/placeholders/person-circle-outline.svg";
+                              "/assets/placeholders/person-circle-outline.svg";
                           }}
                         />
                       </IonAvatar>
