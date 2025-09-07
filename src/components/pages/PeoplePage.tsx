@@ -24,8 +24,9 @@ import {
 } from "@ionic/react";
 import { usePeople } from "../../hooks/usePeople";
 import { Person } from "../../types/Person";
-import { menu } from "ionicons/icons";
 import { cacheEntityName } from "../../utils/cache";
+import TopNavBar from "../shared/TopNavBar";
+
 
 const PeoplePage: React.FC = () => {
   const { data: people, loading, error } = usePeople();
@@ -49,28 +50,15 @@ const PeoplePage: React.FC = () => {
   const groupedPeople = people ? groupPeopleByLetter(people) : {};
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar color="secondary">
-          <IonButtons slot="start">
-            <IonMenuToggle>
-              <IonButton>
-                <IonIcon slot="icon-only" icon={menu}></IonIcon>
-              </IonButton>
-            </IonMenuToggle>
-          </IonButtons>
-          <IonTitle>
-            <strong className="ion-text-uppercase">People</strong>
-          </IonTitle>
-        </IonToolbar>
-
-        <IonToolbar color="secondary">
-          <IonSearchbar
-            debounce={500}
-            placeholder="Search people..."
-            animated={true}
-          />
-        </IonToolbar>
-      </IonHeader>
+      <TopNavBar title="People" />
+      
+      <IonToolbar color="secondary">
+        <IonSearchbar
+          debounce={500}
+          placeholder="Search people..."
+          animated={true}
+        />
+      </IonToolbar>
 
       <IonContent>
         {loading ? (

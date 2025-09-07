@@ -1,11 +1,8 @@
 import React, { useState, useMemo } from "react";
 import {
   IonContent,
-  IonHeader,
   IonPage,
-  IonTitle,
   IonToolbar,
-  IonButtons,
   IonSearchbar,
   IonList,
   IonItem,
@@ -13,11 +10,9 @@ import {
   IonLabel,
   IonSkeletonText,
   IonText,
-  IonButton,
-  IonMenuToggle,
 } from "@ionic/react";
 import { useCategories } from "../../hooks/useCategories";
-import { menu } from "ionicons/icons";
+import TopNavBar from "../shared/TopNavBar";
 
 const CategoryPage: React.FC = () => {
   const [searchText, setSearchText] = useState("");
@@ -40,30 +35,16 @@ const CategoryPage: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar color="secondary">
-          <IonButtons slot="start">
-            <IonMenuToggle>
-              <IonButton>
-                <IonIcon slot="icon-only" icon={menu}></IonIcon>
-              </IonButton>
-            </IonMenuToggle>
-          </IonButtons>
-          <IonTitle>
-            <strong className="ion-text-uppercase">Categories</strong>
-          </IonTitle>
-        </IonToolbar>
-
-        <IonToolbar color="secondary">
-          <IonSearchbar
-            debounce={500}
-            placeholder="Search categories..."
-            animated={true}
-            value={searchText}
-            onIonInput={(e) => setSearchText(e.detail.value!)}
-          />
-        </IonToolbar>
-      </IonHeader>
+      <TopNavBar title="Categories" />
+      <IonToolbar color="secondary">
+        <IonSearchbar
+          debounce={500}
+          placeholder="Search categories..."
+          animated={true}
+          value={searchText}
+          onIonInput={(e) => setSearchText(e.detail.value!)}
+        />
+      </IonToolbar>
 
       <IonContent>
         {error && (

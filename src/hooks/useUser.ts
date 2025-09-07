@@ -1,18 +1,18 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { User } from '../types/User';
-import { Company } from '../types/Company';
-import { Person } from '../types/Person';
-import { useFirestoreDocument } from './useFirestoreDocument';
-import { useFirestoreMutations } from './useFirestoreMutations';
-import { useAuth } from '../contexts/AuthContext';
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { User } from "../types/User";
+import { Company } from "../types/Company";
+import { Person } from "../types/Person";
+import { useFirestoreDocument } from "./useFirestoreDocument";
+import { useFirestoreMutations } from "./useFirestoreMutations";
+import { useAuthContext } from "../contexts/AuthContext";
 
 // Hook for user profile
 export function useUser(userId?: string) {
-  const { auth } = useAuth();
-  const effectiveUserId = userId || auth?.uid;
-  
+  const { user } = useAuthContext();
+  const effectiveUserId = userId || user?.uid;
+
   return useFirestoreDocument<User>(
-    effectiveUserId ? `user/${effectiveUserId}` : '', 
+    effectiveUserId ? `user/${effectiveUserId}` : "",
     { enabled: !!effectiveUserId }
   );
 }
@@ -21,70 +21,94 @@ export function useUser(userId?: string) {
 export function useUserMutations() {
   const mutations = useFirestoreMutations();
 
-  const createUser = useCallback(async (userId: string, userData: Omit<User, 'id'>) => {
-    const userDoc = {
-      ...userData,
-      id: userId,
-      favoriteIds: userData.favoriteIds || [],
-      isActive: true
-    };
-    return mutations.setDocument(`user/${userId}`, userDoc);
-  }, [mutations]);
+  const createUser = useCallback(
+    async (userId: string, userData: Omit<User, "id">) => {
+      const userDoc = {
+        ...userData,
+        id: userId,
+        favoriteIds: userData.favoriteIds || [],
+        isActive: true,
+      };
+      return mutations.setDocument(`user/${userId}`, userDoc);
+    },
+    [mutations]
+  );
 
-  const updateUser = useCallback(async (userId: string, userData: Partial<User>) => {
-    return mutations.updateDocument(`user/${userId}`, userData);
-  }, [mutations]);
+  const updateUser = useCallback(
+    async (userId: string, userData: Partial<User>) => {
+      return mutations.updateDocument(`user/${userId}`, userData);
+    },
+    [mutations]
+  );
 
-  const addFavorite = useCallback(async (userId: string, itemId: string) => {
-    return mutations.addToArray(`user/${userId}`, 'favoriteIds', itemId);
-  }, [mutations]);
+  const addFavorite = useCallback(
+    async (userId: string, itemId: string) => {
+      return mutations.addToArray(`user/${userId}`, "favoriteIds", itemId);
+    },
+    [mutations]
+  );
 
-  const removeFavorite = useCallback(async (userId: string, itemId: string) => {
-    return mutations.removeFromArray(`user/${userId}`, 'favoriteIds', itemId);
-  }, [mutations]);
+  const removeFavorite = useCallback(
+    async (userId: string, itemId: string) => {
+      return mutations.removeFromArray(`user/${userId}`, "favoriteIds", itemId);
+    },
+    [mutations]
+  );
 
   return {
     createUser,
     updateUser,
     addFavorite,
     removeFavorite,
-    ...mutations.state
+    ...mutations.state,
   };
 }
 
 // Hook for managing favorites
 export function useFavorites(userId?: string) {
-  const { auth } = useAuth();
-  const effectiveUserId = userId || auth?.uid;
+  const { user } = useAuthContext();
+  const effectiveUserId = userId || user?.uid;
   const mutations = useUserMutations();
-  
-  const { data: user, loading, error } = useUser(effectiveUserId);
-  
-  const favoriteIds = useMemo(() => user?.favoriteIds || [], [user]);
 
-  const isFavorite = useCallback((itemId: string) => {
-    return favoriteIds.includes(itemId);
-  }, [favoriteIds]);
+  const { data: userData, loading, error } = useUser(effectiveUserId);
 
-  const toggleFavorite = useCallback(async (itemId: string) => {
-    if (!effectiveUserId) return;
-    
-    if (isFavorite(itemId)) {
-      await mutations.removeFavorite(effectiveUserId, itemId);
-    } else {
+  const favoriteIds = useMemo(() => userData?.favoriteIds || [], [userData]);
+
+  const isFavorite = useCallback(
+    (itemId: string) => {
+      return favoriteIds.includes(itemId);
+    },
+    [favoriteIds]
+  );
+
+  const toggleFavorite = useCallback(
+    async (itemId: string) => {
+      if (!effectiveUserId) return;
+
+      if (isFavorite(itemId)) {
+        await mutations.removeFavorite(effectiveUserId, itemId);
+      } else {
+        await mutations.addFavorite(effectiveUserId, itemId);
+      }
+    },
+    [effectiveUserId, isFavorite, mutations]
+  );
+
+  const addFavorite = useCallback(
+    async (itemId: string) => {
+      if (!effectiveUserId || isFavorite(itemId)) return;
       await mutations.addFavorite(effectiveUserId, itemId);
-    }
-  }, [effectiveUserId, isFavorite, mutations]);
+    },
+    [effectiveUserId, isFavorite, mutations]
+  );
 
-  const addFavorite = useCallback(async (itemId: string) => {
-    if (!effectiveUserId || isFavorite(itemId)) return;
-    await mutations.addFavorite(effectiveUserId, itemId);
-  }, [effectiveUserId, isFavorite, mutations]);
-
-  const removeFavorite = useCallback(async (itemId: string) => {
-    if (!effectiveUserId || !isFavorite(itemId)) return;
-    await mutations.removeFavorite(effectiveUserId, itemId);
-  }, [effectiveUserId, isFavorite, mutations]);
+  const removeFavorite = useCallback(
+    async (itemId: string) => {
+      if (!effectiveUserId || !isFavorite(itemId)) return;
+      await mutations.removeFavorite(effectiveUserId, itemId);
+    },
+    [effectiveUserId, isFavorite, mutations]
+  );
 
   return {
     favoriteIds,
@@ -94,7 +118,7 @@ export function useFavorites(userId?: string) {
     toggleFavorite,
     addFavorite,
     removeFavorite,
-    mutationState: mutations
+    mutationState: mutations,
   };
 }
 
@@ -102,14 +126,14 @@ export function useFavorites(userId?: string) {
 export function useFavoriteCompanies(userId?: string) {
   const { favoriteIds } = useFavorites(userId);
   const mutations = useFirestoreMutations();
-  
+
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const fetchFavoriteCompanies = async () => {
       if (!favoriteIds.length) {
         setCompanies([]);
@@ -123,7 +147,9 @@ export function useFavoriteCompanies(userId?: string) {
       try {
         const companyPromises = favoriteIds.map(async (id) => {
           try {
-            const company = await mutations.getDocument<Company>(`company/${id}`);
+            const company = await mutations.getDocument<Company>(
+              `company/${id}`
+            );
             return company && company.isActive ? company : null;
           } catch (err) {
             console.warn(`Failed to fetch favorite company ${id}:`, err);
@@ -132,10 +158,14 @@ export function useFavoriteCompanies(userId?: string) {
         });
 
         const results = await Promise.all(companyPromises);
-        const validCompanies = results.filter((company): company is Company => company !== null);
-        
+        const validCompanies = results.filter(
+          (company): company is Company => company !== null
+        );
+
         // Sort by name
-        validCompanies.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        validCompanies.sort((a, b) =>
+          (a.name || "").localeCompare(b.name || "")
+        );
 
         if (isMounted) {
           setCompanies(validCompanies);
@@ -163,14 +193,14 @@ export function useFavoriteCompanies(userId?: string) {
 export function useFavoritePeople(userId?: string) {
   const { favoriteIds } = useFavorites(userId);
   const mutations = useFirestoreMutations();
-  
+
   const [people, setPeople] = useState<Person[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const fetchFavoritePeople = async () => {
       if (!favoriteIds.length) {
         setPeople([]);
@@ -193,12 +223,15 @@ export function useFavoritePeople(userId?: string) {
         });
 
         const results = await Promise.all(personPromises);
-        const validPeople = results.filter((person): person is Person => person !== null);
-        
+        const validPeople = results.filter(
+          (person): person is Person => person !== null
+        );
+
         // Sort by name
-        validPeople.sort((a, b) => 
-          (a.firstName || '').localeCompare(b.firstName || '') ||
-          (a.lastName || '').localeCompare(b.lastName || '')
+        validPeople.sort(
+          (a, b) =>
+            (a.firstName || "").localeCompare(b.firstName || "") ||
+            (a.lastName || "").localeCompare(b.lastName || "")
         );
 
         if (isMounted) {

@@ -1,37 +1,48 @@
-import React from 'react';
-import { IonSpinner, IonContent } from '@ionic/react';
-import { useAuth } from '../../contexts/AuthContext';
-import { AuthPage } from '../pages/AuthPage';
+import React from "react";
+import { Route, Redirect, RouteComponentProps } from "react-router-dom";
+import { useAuthContext } from "../../contexts/AuthContext";
+import { IonContent, IonPage, IonSpinner } from "@ionic/react";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
-  fallback?: React.ComponentType;
+  component: React.ComponentType<RouteComponentProps<any>>;
+  exact?: boolean;
+  path: string;
+  requireAdmin?: boolean;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  fallback: FallbackComponent = AuthPage 
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  component: Component,
+  requireAdmin = false,
+  ...rest
 }) => {
-  const { auth, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuthContext();
 
   if (loading) {
     return (
-      <IonContent>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '100vh' 
-        }}>
-          <IonSpinner />
-        </div>
-      </IonContent>
+      <IonPage>
+        <IonContent className="flex items-center justify-center">
+          <IonSpinner name="crescent" />
+        </IonContent>
+      </IonPage>
     );
   }
 
-  if (!auth) {
-    return <FallbackComponent />;
-  }
+  return (
+    <Route
+      {...rest}
+      render={(props) => {
+        if (!user) {
+          return <Redirect to="/login" />;
+        }
 
-  return <>{children}</>;
+        if (requireAdmin && !isAdmin) {
+          return <Redirect to="/people" />;
+        }
+
+        return <Component {...props} />;
+      }}
+    />
+  );
 };
+
+export default ProtectedRoute;

@@ -1,15 +1,27 @@
-import { User as FirebaseUser, UserInfo, UserMetadata } from 'firebase/auth';
-import { User } from './User';
+import { User as FirebaseUser } from 'firebase/auth';
 
-export interface Auth extends FirebaseUser {
-    user: User;
-    role?: any;
+export interface User {
+  id: string;
+  isActive: boolean;
+  firstName: string;
+  lastName: string;
+  photoURL?: string;
+  email: string;
+  status: string;
+  loginCount: number;
+  country: string;
+  language: string;
+  roleId: string;
+  contactIds: string[];
 }
 
-export const getPermissionIds = (auth: Auth): string[] => {
-    const userPermissions = auth.user?.permissionIds || [];
-    const rolePermissions = auth.role?.permissionIds || [];
-    const allPermissions = [...userPermissions, ...rolePermissions];
-    const uniquePermissions = Array.from(new Set(allPermissions));
-    return uniquePermissions.sort();
-};
+export interface Role {
+  id: string;
+  name: string;
+  permissionIds: string[];
+}
+
+export interface Auth extends FirebaseUser {
+  user: User | null;
+  role: Role | null;
+}

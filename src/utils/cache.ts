@@ -11,13 +11,13 @@ export const cacheEntity = (id: string, data: any) => {
 export const getCachedEntity = (id: string): any | undefined => {
   const cached = entityCache.get(id);
   if (!cached) return undefined;
-  
+
   // Cache expires after 5 minutes
   if (Date.now() - cached._cachedAt > 5 * 60 * 1000) {
     entityCache.delete(id);
     return undefined;
   }
-  
+
   return cached;
 };
 

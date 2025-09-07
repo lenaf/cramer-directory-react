@@ -1,53 +1,34 @@
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
-import { auth, db } from '../lib/firebase';
-import { AuthService } from '../services/AuthService';
-import { FirestoreService } from '../services/FirestoreService';
-import { Auth } from '../types/Auth';
+import React, { createContext, useContext, ReactNode } from "react";
+import { UserCredential } from "firebase/auth";
+import { useAuth } from "../hooks/useAuth";
+import { Auth } from "../types/Auth";
 
 interface AuthContextType {
-  auth: Auth | null;
-  authService: AuthService;
+  user: Auth | null;
   loading: boolean;
+  signIn: (email: string, password: string) => Promise<UserCredential>;
+  signUp: (email: string, password: string) => Promise<UserCredential>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  sendVerificationEmail: () => Promise<void>;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const auth = useAuth();
+
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [authData, setAuthData] = useState<Auth | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const authService = useMemo(() => {
-    const firestoreService = new FirestoreService(db);
-    return new AuthService(auth, firestoreService);
-  }, []);
-
-  useEffect(() => {
-    const subscription = authService.auth$.subscribe({
-      next: (authData) => {
-        setAuthData(authData);
-        setLoading(false);
-      },
-      error: (error) => {
-        console.error('Auth error:', error);
-        setAuthData(null);
-        setLoading(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [authService]);
-
-  return (
-    <AuthContext.Provider value={{ auth: authData, authService, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
+export const useAuthContext = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuthContext must be used within an AuthProvider");
+  }
+  return context;
 };

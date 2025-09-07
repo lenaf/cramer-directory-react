@@ -1,7 +1,6 @@
 import React from "react";
 import {
   IonRouterOutlet,
-  IonSplitPane,
   IonTabBar,
   IonTabButton,
   IonTabs,
@@ -18,10 +17,12 @@ import { AuthProvider } from "./contexts/AuthContext";
 import "./theme/variables.scss"; // must be imported after ionic core for precedence
 import "./global.scss";
 import { Redirect, Route, useLocation } from "react-router-dom";
-import { ROUTES } from "./routes";
-import SideMenu from "./components/SideMenu";
+import { NAV_ROUTES } from "./routes";
 import CompanyDetailPage from "./components/pages/CompanyDetailPage";
 import PersonDetailPage from "./components/pages/PersonDetailPage";
+import LoginPage from "./components/auth/LoginPage";
+import ForgotPasswordPage from "./components/auth/ForgotPasswordPage";
+import SignupPage from "./components/auth/SignupPage";
 
 setupIonicReact();
 export const SPLIT_PLANE_CONTENT_ID = "split-plane-content";
@@ -29,59 +30,59 @@ export const SPLIT_PLANE_CONTENT_ID = "split-plane-content";
 const AppContent: React.FC = () => {
   const location = useLocation();
   const currentRoute =
-    ROUTES.find((t) => t.path === location.pathname) || ROUTES[0];
+    NAV_ROUTES.find((t) => t.path === location.pathname) || NAV_ROUTES[0];
 
   return (
-    <IonSplitPane when="sm" contentId={SPLIT_PLANE_CONTENT_ID}>
-      <SideMenu />
-      {/* MAIN */}
-      <div className="ion-page" id={SPLIT_PLANE_CONTENT_ID}>
-        {/* ROUTING AND MAIN CONTENT */}
-        <IonContent className="ion-padding">
-          <IonTabs>
-            <IonRouterOutlet>
-              {ROUTES.map((route) => (
-                <Route
-                  key={route.id}
-                  exact
-                  path={route.path}
-                  component={route.component}
-                />
-              ))}
-              <Route exact path="/company/:id" component={CompanyDetailPage} />
-              <Route exact path="/people/:id" component={PersonDetailPage} />
-              <Route exact path="/" render={() => <Redirect to="/home" />} />
-            </IonRouterOutlet>
+    <div className="ion-page">
+      {/* ROUTING AND MAIN CONTENT */}
+      <IonContent className="ion-padding">
+        <IonTabs>
+          <IonRouterOutlet>
+            {NAV_ROUTES.map((route) => (
+              <Route
+                key={route.id}
+                exact
+                path={route.path}
+                component={route.component}
+              />
+            ))}
+            <Route exact path="/company/:id" component={CompanyDetailPage} />
+            <Route exact path="/people/:id" component={PersonDetailPage} />
+            <Route exact path="/login" component={LoginPage} />
+            <Route
+              exact
+              path="/forgot-password"
+              component={ForgotPasswordPage}
+            />
+            <Route exact path="/signup" component={SignupPage} />
 
-            <IonTabBar slot="bottom" color="secondary">
-              {ROUTES.map((route) => {
-                const isActive = currentRoute.path === route.path;
-                return (
-                  <IonTabButton
-                    key={route.id}
-                    tab={route.id}
-                    href={route.path}
-                    className={
-                      isActive ? "bg-white bg-opacity-20 font-bold" : ""
-                    }
-                  >
-                    <IonIcon
-                      icon={route.icon}
-                      className={isActive ? "text-white" : ""}
-                    />
-                    <IonLabel
-                      className={isActive ? "text-white font-bold" : ""}
-                    >
-                      {route.label}
-                    </IonLabel>
-                  </IonTabButton>
-                );
-              })}
-            </IonTabBar>
-          </IonTabs>
-        </IonContent>
-      </div>
-    </IonSplitPane>
+            <Route exact path="/" render={() => <Redirect to="/home" />} />
+          </IonRouterOutlet>
+
+          <IonTabBar slot="bottom" color="secondary">
+            {NAV_ROUTES.map((route) => {
+              const isActive = currentRoute.path === route.path;
+              return (
+                <IonTabButton
+                  key={route.id}
+                  tab={route.id}
+                  href={route.path}
+                  className={isActive ? "bg-white bg-opacity-20 font-bold" : ""}
+                >
+                  <IonIcon
+                    icon={route.icon}
+                    className={isActive ? "text-white" : ""}
+                  />
+                  <IonLabel className={isActive ? "text-white font-bold" : ""}>
+                    {route.label}
+                  </IonLabel>
+                </IonTabButton>
+              );
+            })}
+          </IonTabBar>
+        </IonTabs>
+      </IonContent>
+    </div>
   );
 };
 

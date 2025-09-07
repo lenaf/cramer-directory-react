@@ -25,8 +25,9 @@ import {
 } from "@ionic/react";
 import { useCompanySearch } from "../../hooks/useCompanies";
 import { Company } from "../../types/Company";
-import { menu } from "ionicons/icons";
 import { cacheEntityName } from "../../utils/cache";
+import TopNavBar from "../shared/TopNavBar";
+
 
 const CompanyPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -67,18 +68,7 @@ const CompanyPage: React.FC = () => {
   if (error) {
     return (
       <IonPage>
-        <IonHeader>
-          <IonToolbar color="secondary">
-            <IonButtons slot="start">
-              <IonMenuToggle>
-                <IonButton>
-                  <IonIcon slot="icon-only" icon={menu}></IonIcon>
-                </IonButton>
-              </IonMenuToggle>
-            </IonButtons>
-            <IonTitle>Companies</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <TopNavBar title="Companies" />
         <IonContent>
           <div style={{ textAlign: "center", padding: "20px" }}>
             <IonText color="danger">
@@ -93,35 +83,20 @@ const CompanyPage: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar color="secondary">
-          <IonButtons slot="start">
-            <IonMenuToggle>
-              <IonButton>
-                <IonIcon slot="icon-only" icon={menu}></IonIcon>
-              </IonButton>
-            </IonMenuToggle>{" "}
-          </IonButtons>
-          <IonTitle>
-            <strong className="ion-text-uppercase">
-              Companies
-              {totalCount > 0 &&
-                `(${searchTerm ? searchResults.length : totalCount})`}
-            </strong>
-          </IonTitle>
-        </IonToolbar>
-
-        <IonToolbar color="secondary">
-          <IonSearchbar
-            debounce={300}
-            placeholder="Search companies..."
-            animated={true}
-            value={searchTerm}
-            onIonInput={handleSearchInput}
-            showClearButton="focus"
-          />
-        </IonToolbar>
-      </IonHeader>
+      <TopNavBar 
+        title={`Companies${totalCount > 0 ? ` (${searchTerm ? searchResults.length : totalCount})` : ''}`} 
+      />
+      
+      <IonToolbar color="secondary">
+        <IonSearchbar
+          debounce={300}
+          placeholder="Search companies..."
+          animated={true}
+          value={searchTerm}
+          onIonInput={handleSearchInput}
+          showClearButton="focus"
+        />
+      </IonToolbar>
 
       <IonContent>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
